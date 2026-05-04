@@ -116,3 +116,4 @@ The worker deployment includes a **HorizontalPodAutoscaler** that scales from 2 
 - [x] Phase 4 — Scheduled re-crawls + Railway + Vercel deployment
 - [ ] Phase 5 — Celery Beat on Railway for automated scheduling
 - [ ] Phase 6 — Email/webhook alerts on page changes
+# CI/CD Test
