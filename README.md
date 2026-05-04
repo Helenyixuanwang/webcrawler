@@ -39,6 +39,7 @@ git push origin main
 
 
 ## Project Structure
+```
 webcrawler/
 ├── backend/
 │   ├── app/
@@ -64,6 +65,7 @@ webcrawler/
 │   ├── postgres.yaml
 │   └── redis.yaml
 └── docker-compose.yml
+```
 ## Quick Start (Local)
 
 ### Prerequisites
