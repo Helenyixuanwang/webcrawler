@@ -1,3 +1,4 @@
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,6 +27,13 @@ spec:
               value: redis://redis:6379/0
             - name: CELERY_RESULT_BACKEND
               value: redis://redis:6379/0
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
