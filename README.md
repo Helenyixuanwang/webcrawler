@@ -1,10 +1,19 @@
 # 🕷️ WebCrawler
 
+[![CI](https://github.com/Helenyixuanwang/webcrawler/actions/workflows/ci.yml/badge.svg)](https://github.com/Helenyixuanwang/webcrawler/actions/workflows/ci.yml)
+
 A full-stack web crawler built with **FastAPI**, **Celery**, **PostgreSQL**, and **Redis** — deployed on **Railway** and **Vercel**, with **Kubernetes** support.
 
 ## 🌐 Live Demo
 - **Frontend**: https://webcrawler-liart.vercel.app
 - **Backend API**: https://backend-production-dd8b.up.railway.app/docs
+
+## 🔄 CI/CD Pipeline
+git push origin main
+→ GitHub Actions: FastAPI syntax check + pip install (parallel with frontend)
+→ GitHub Actions: React Vite build (parallel with backend)
+→ if both ✅ → Railway auto-deploys backend
+→ if both ✅ → Railway auto-deploys worker
 
 ## Features
 - 🔍 **BFS Crawling** — crawl all reachable pages from a seed URL up to configurable depth
@@ -26,6 +35,8 @@ A full-stack web crawler built with **FastAPI**, **Celery**, **PostgreSQL**, and
 | Container | Docker + Docker Compose |
 | Orchestration | Kubernetes + HPA |
 | Deployment | Railway (backend) + Vercel (frontend) |
+| CI/CD | GitHub Actions + Railway auto-deploy |
+
 
 ## Project Structure
 webcrawler/
