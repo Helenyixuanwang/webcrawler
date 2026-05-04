@@ -5,7 +5,7 @@ from app.core.database import get_db
 from app.models.crawl import CrawlJob, CrawledPage, PageSnapshot, JobStatus
 from app.schemas.crawl import (
     CrawlJobCreate, CrawlJobResponse, CrawlJobListResponse,
-    CrawledPagesListResponse, CrawledPageResponse, CrawledPageDetail,
+    CrawledPagesListResponse, CrawledPageDetail,
     PageSnapshotResponse,
 )
 from app.workers.crawl_tasks import run_crawl_job
@@ -22,6 +22,8 @@ def create_job(payload: CrawlJobCreate, db: Session = Depends(get_db)):
         max_depth=payload.max_depth,
         max_pages=payload.max_pages,
         status=JobStatus.PENDING,
+        is_scheduled=payload.is_scheduled,
+        schedule_interval=payload.schedule_interval,
     )
     db.add(job)
     db.commit()

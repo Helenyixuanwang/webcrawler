@@ -49,9 +49,10 @@ function JobTable({ jobs, onRefresh }) {
         <tr>
           <th>Seed URL</th>
           <th>Status</th>
-          <th>Pages Crawled</th>
+          <th>Pages</th>
           <th>Depth</th>
-          <th>Max Pages</th>
+          <th>Schedule</th>
+          <th>Last Crawled</th>
           <th>Created</th>
           <th></th>
         </tr>
@@ -63,13 +64,27 @@ function JobTable({ jobs, onRefresh }) {
             onClick={() => navigate(`/jobs/${job.id}`)}
             style={{ cursor: "pointer" }}
           >
-            <td style={{ maxWidth: "250px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            <td style={{ maxWidth: "220px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {job.seed_url}
             </td>
             <td><StatusBadge status={job.status} /></td>
             <td>{job.pages_crawled}</td>
             <td>{job.max_depth}</td>
-            <td>{job.max_pages}</td>
+            <td>
+              {job.is_scheduled ? (
+                <span style={{
+                  backgroundColor: "#ede9fe",
+                  color: "#7c3aed",
+                  padding: "3px 10px",
+                  borderRadius: "999px",
+                  fontSize: "0.78rem",
+                  fontWeight: "600",
+                }}>
+                  every {job.schedule_interval}h
+                </span>
+              ) : "—"}
+            </td>
+            <td>{job.last_crawled_at ? new Date(job.last_crawled_at).toLocaleString() : "—"}</td>
             <td>{new Date(job.created_at).toLocaleString()}</td>
             <td>
               <button

@@ -5,6 +5,8 @@ function JobForm({ onJobCreated }) {
   const [seedUrl, setSeedUrl] = useState("");
   const [maxDepth, setMaxDepth] = useState(2);
   const [maxPages, setMaxPages] = useState(20);
+  const [isScheduled, setIsScheduled] = useState(false);
+  const [scheduleInterval, setScheduleInterval] = useState(24);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -13,8 +15,15 @@ function JobForm({ onJobCreated }) {
     setError("");
     setLoading(true);
     try {
-      await createJob({ seed_url: seedUrl, max_depth: maxDepth, max_pages: maxPages });
+      await createJob({
+        seed_url: seedUrl,
+        max_depth: maxDepth,
+        max_pages: maxPages,
+        is_scheduled: isScheduled,
+        schedule_interval: isScheduled ? scheduleInterval : null,
+      });
       setSeedUrl("");
+      setIsScheduled(false);
       onJobCreated();
     } catch (e) {
       setError("Failed to create job. Is the backend running?");
@@ -76,6 +85,34 @@ function JobForm({ onJobCreated }) {
           {loading ? "Submitting..." : "Crawl"}
         </button>
       </div>
+
+      {/* Scheduled crawl option */}
+      <div style={{ marginTop: "1rem", display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.9rem", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={isScheduled}
+            onChange={(e) => setIsScheduled(e.target.checked)}
+            style={{ width: "auto" }}
+          />
+          Schedule re-crawl
+        </label>
+        {isScheduled && (
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <label style={{ fontSize: "0.85rem", color: "#666" }}>Every</label>
+            <input
+              type="number"
+              min={1}
+              max={168}
+              value={scheduleInterval}
+              onChange={(e) => setScheduleInterval(Number(e.target.value))}
+              style={{ width: "70px" }}
+            />
+            <label style={{ fontSize: "0.85rem", color: "#666" }}>hours</label>
+          </div>
+        )}
+      </div>
+
       {error && <p style={{ color: "red", marginTop: "0.5rem", fontSize: "0.85rem" }}>{error}</p>}
     </div>
   );

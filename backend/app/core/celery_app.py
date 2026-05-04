@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.schedules import crontab
 from app.core.config import settings
 
 celery_app = Celery(
@@ -16,4 +17,10 @@ celery_app.conf.update(
     enable_utc=True,
     task_track_started=True,
     worker_prefetch_multiplier=1,
+    beat_schedule={
+        "run-scheduled-crawls": {
+            "task": "crawl_tasks.run_scheduled_crawls",
+            "schedule": crontab(minute="*/30"),  # every 30 minutes
+        },
+    },
 )

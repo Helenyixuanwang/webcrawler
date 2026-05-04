@@ -8,6 +8,8 @@ class CrawlJobCreate(BaseModel):
     seed_url: str
     max_depth: int = 3
     max_pages: int = 100
+    is_scheduled: bool = False
+    schedule_interval: Optional[int] = None  # hours between re-crawls
 
 
 class CrawlJobResponse(BaseModel):
@@ -17,6 +19,9 @@ class CrawlJobResponse(BaseModel):
     max_pages: int
     status: JobStatus
     pages_crawled: int
+    is_scheduled: bool
+    schedule_interval: Optional[int]
+    last_crawled_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
 

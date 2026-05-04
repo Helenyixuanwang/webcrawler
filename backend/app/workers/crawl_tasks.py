@@ -4,7 +4,8 @@ from app.core.database import SessionLocal
 from app.models.crawl import CrawlJob, CrawledPage, PageSnapshot, JobStatus
 from app.services.crawler import crawl_site
 from app.core.config import settings
-from datetime import datetime
+from datetime import datetime, timedelta
+import uuid
 
 
 @celery_app.task(bind=True, name="crawl_tasks.run_crawl_job")
@@ -80,6 +81,7 @@ def run_crawl_job(self, job_id: str):
 
         job.status = JobStatus.COMPLETED
         job.pages_crawled = pages_done
+        job.last_crawled_at = datetime.utcnow()
         job.updated_at = datetime.utcnow()
         db.commit()
 
@@ -92,6 +94,46 @@ def run_crawl_job(self, job_id: str):
             job.updated_at = datetime.utcnow()
             db.commit()
         raise e
+
+    finally:
+        db.close()
+
+
+@celery_app.task(name="crawl_tasks.run_scheduled_crawls")
+def run_scheduled_crawls():
+    """Runs every 30 minutes via Celery Beat. Re-crawls any scheduled jobs that are due."""
+    db = SessionLocal()
+    try:
+        now = datetime.utcnow()
+        scheduled_jobs = (
+            db.query(CrawlJob)
+            .filter(CrawlJob.is_scheduled == True)
+            .filter(CrawlJob.status == JobStatus.COMPLETED)
+            .all()
+        )
+
+        triggered = 0
+        for job in scheduled_jobs:
+            interval_hours = job.schedule_interval or 24
+            due_at = (job.last_crawled_at or job.created_at) + timedelta(hours=interval_hours)
+            if now >= due_at:
+                # Create a new job for this re-crawl
+                new_job = CrawlJob(
+                    id=str(uuid.uuid4()),
+                    seed_url=job.seed_url,
+                    max_depth=job.max_depth,
+                    max_pages=job.max_pages,
+                    status=JobStatus.PENDING,
+                    is_scheduled=True,
+                    schedule_interval=job.schedule_interval,
+                )
+                db.add(new_job)
+                db.commit()
+                db.refresh(new_job)
+                run_crawl_job.delay(new_job.id)
+                triggered += 1
+
+        return {"triggered": triggered}
 
     finally:
         db.close()

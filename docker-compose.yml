@@ -35,6 +35,22 @@ services:
       - ./backend:/app
     command: celery -A app.core.celery_app worker --loglevel=info --concurrency=2
 
+  beat:
+    build: ./backend
+    environment:
+      - DATABASE_URL=postgresql://crawler:crawler@db:5432/crawlerdb
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: celery -A app.core.celery_app beat --loglevel=info
+
   flower:
     build: ./backend
     ports:

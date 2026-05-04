@@ -25,6 +25,9 @@ class CrawlJob(Base):
     status = Column(SAEnum(JobStatus), default=JobStatus.PENDING)
     celery_task_id = Column(String, nullable=True)
     pages_crawled = Column(Integer, default=0)
+    is_scheduled = Column(Boolean, default=False)
+    schedule_interval = Column(Integer, nullable=True)  # hours between re-crawls
+    last_crawled_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
